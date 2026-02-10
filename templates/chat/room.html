@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h3>{{ room.product.title }} 채팅방</h3>
+    <div id="chat-log" style="border: 1px solid #ccc; height: 300px; overflow-y: scroll; padding: 10px; margin-bottom: 10px;">
+        {% for msg in chat_messages %}
+            <div><strong>{{ msg.sender.nickname|default:msg.sender.username }}:</strong> {{ msg.content }}</div>
+        {% endfor %}
+    </div>
+    <input id="chat-message-input" type="text" class="form-control" placeholder="메시지를 입력하세요...">
+    <button id="chat-message-submit" class="btn btn-success mt-2">전송</button>
+</div>
+
+<script>
+    const roomId = "{{ room.id }}";
+    const chatSocket = new WebSocket(
+        'ws://' + window.location.host + '/ws/chat/' + roomId + '/'
+    );
+
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data); // 대문자 JSON 확인!
+        const chatLog = document.querySelector('#chat-log');
+        const senderName = data.nickname || data.user;
+        chatLog.innerHTML += (`<div><strong>${senderName}:</strong> ${data.message}</div>`);
+        chatLog.scrollTop = chatLog.scrollHeight;
+    };
+
+    document.querySelector('#chat-message-submit').onclick = function(e) {
+        const messageInputDom = document.querySelector('#chat-message-input');
+        const message = messageInputDom.value;
+        if (message.trim() !== "") {
+            chatSocket.send(JSON.stringify({ 'message': message })); // 대문자 JSON 확인!
+            messageInputDom.value = '';
+        }
+    };
+
+    document.querySelector('#chat-message-input').onkeyup = function(e) {
+        if (e.keyCode === 13) {
+            document.querySelector('#chat-message-submit').click();
+        }
+    };
+</script>
+{% endblock %}

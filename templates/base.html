@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SafePoint Market</title>
+    <title>🚙 중고거래 사이트 🚙</title>
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <style>
         :root {
@@ -116,11 +116,17 @@
     <div class="container">
         <nav>
             <div class="logo">
-                <a href="/">SafePoint</a>
+                <a href="/">🚙 중고거래 사이트 🚙</a>
             </div>
             <div>
                 {% if user.is_authenticated %}
                     <span class="user-info">안녕하세요, {{ user.nickname|default:user.username }}님!</span>
+                    <a class="nav-link" href="{% url 'chat:chat_list' %}">💬 채팅</a>
+                    <a href="{% url 'market' %}">마켓</a>
+                    <a href="{% url 'board_home' %}">커뮤니티</a>
+                    {% if user.nickname %}
+                        <a href="{% url 'profile' user.nickname %}">내 프로필</a>
+                    {% endif %}
                     <a href="{% url 'logout' %}">로그아웃</a>
                 {% else %}
                     <a href="{% url 'login' %}">로그인</a>

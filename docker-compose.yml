@@ -42,6 +42,12 @@ services:
     networks:
       - safepoint_net
 
+  redis:
+    image: redis:7-alpine
+    container_name: safepoint_redis
+    networks:
+      - safepoint_net
+
 networks:
   safepoint_net:
     driver: bridge

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{{ question.title }}</h1>
+    <p style="color:#868e96;">
+        {{ question.author.nickname|default:question.author.username }} · {{ question.created_at|date:"Y-m-d H:i" }}
+        · 현상금 {{ question.bounty }}P
+        · {% if question.is_solved %}해결{% else %}미해결{% endif %}
+    </p>
+
+    <div style="margin-top:15px;">
+        {{ question.content|linebreaks }}
+    </div>
+
+    <h2 style="margin-top:30px;">답변</h2>
+    {% if question.answers.all %}
+        <ul style="list-style:none; padding:0;">
+            {% for a in question.answers.all %}
+                <li style="border:1px solid #dee2e6; border-radius:8px; padding:12px; margin-bottom:10px;">
+                    <p style="margin:0 0 6px 0; color:#868e96;">
+                        {{ a.author.nickname|default:a.author.username }} · {{ a.created_at|date:"Y-m-d H:i" }}
+                        {% if question.accepted_answer_id == a.id %}
+                            · <strong style="color:#FF7E36;">채택됨</strong>
+                        {% endif %}
+                    </p>
+                    <div>{{ a.content|linebreaks }}</div>
+
+                    {% if user.is_authenticated and user.id == question.author_id and not question.is_solved %}
+                        <form method="post" action="{% url 'accept_answer' question.pk a.pk %}" style="margin-top:10px;">
+                            {% csrf_token %}
+                            <button type="submit">이 답변 채택</button>
+                        </form>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>아직 답변이 없습니다.</p>
+    {% endif %}
+
+    {% if user.is_authenticated %}
+        <h3 style="margin-top:25px;">답변 작성</h3>
+        <form method="post" action="{% url 'answer_create' question.pk %}">
+            {% csrf_token %}
+            {{ answer_form.as_p }}
+            <button type="submit">답변 등록</button>
+        </form>
+    {% else %}
+        <p style="margin-top:20px;">답변을 작성하려면 로그인하세요.</p>
+    {% endif %}
+
+    <p style="margin-top:20px;">
+        <a href="{% url 'question_list' %}">목록으로</a>
+    </p>
+{% endblock %}
+

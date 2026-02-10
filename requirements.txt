@@ -4,3 +4,11 @@ django==4.2
 mysqlclient
 # WAS
 gunicorn
+# .env 로딩(로컬 개발용, 컨테이너에서도 안전)
+python-dotenv
+# ImageField 지원
+Pillow
+# 실시간 통신을 위한 라이브러리와 인프라
+daphne==4.0.0
+channels[daphne]==4.0.0
+channels-redis==4.1.0

@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>질문 등록</h1>
+    <p style="color:#868e96;">포인트 지급/차감은 3번 금융 시스템을 제외했기 때문에 아직 동작하지 않습니다.</p>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">등록</button>
+    </form>
+{% endblock %}
+

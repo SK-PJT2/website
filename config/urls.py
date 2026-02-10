@@ -21,6 +21,8 @@ from config import views as config_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
-    path('market/', config_views.market_view, name='market'),
+    path('market/', include('market.urls')),
+    path('board/', include('board.urls')),
     path('', config_views.home_view, name='home'),
+    path('chat/', include('chat.urls')),
 ]

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .chat-container { max-width: 600px; margin: 0 auto; }
+    .chat-card {
+        display: flex;
+        align-items: center;
+        padding: 16px;
+        border-bottom: 1px solid #f1f1f1;
+        transition: background-color 0.2s;
+        text-decoration: none !important;
+        color: inherit !important;
+    }
+    .chat-card:hover { background-color: #f8f9fa; }
+    .product-img {
+        width: 60px; height: 60px;
+        border-radius: 8px;
+        object-fit: cover;
+        margin-right: 15px;
+        background-color: #eee;
+    }
+    .chat-info { flex: 1; }
+    .chat-header { display: flex; justify-content: space-between; margin-bottom: 4px; }
+    .chat-user { font-weight: 700; font-size: 1rem; color: #212529; }
+    .chat-date { font-size: 0.8rem; color: #868e96; }
+    .product-title { font-size: 0.9rem; color: #ff7e36; font-weight: 600; margin-bottom: 2px; }
+    .last-msg { font-size: 0.9rem; color: #495057; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; }
+</style>
+
+<div class="chat-container">
+    <h3 class="mb-4" style="font-weight: 800; padding-left: 10px;">채팅</h3>
+    
+    <div class="list-group list-group-flush shadow-sm" style="border-radius: 12px; overflow: hidden; background: white;">
+        {% for room in rooms %}
+            <a href="{% url 'chat:room_detail' room.id %}" class="chat-card">
+                {% if room.product.images.first %}
+                    <img src="{{ room.product.images.first.image.url }}" class="product-img">
+                {% else %}
+                    <div class="product-img d-flex align-items-center justify-content-center text-muted" style="font-size: 0.7rem;">No Img</div>
+                {% endif %}
+
+                <div class="chat-info">
+                    <div class="chat-header">
+                        <span class="chat-user">
+                            {% if request.user == room.seller %}
+                                {{ room.buyer.nickname|default:room.buyer.username }}
+                            {% else %}
+                                {{ room.seller.nickname|default:room.seller.username }}
+                            {% endif %}
+                        </span>
+                        <span class="chat-date">{{ room.created_at|date:"n월 j일" }}</span>
+                    </div>
+                    <div class="product-title">[{{ room.product.title }}]</div>
+                    <p class="last-msg mb-0">대화를 시작해보세요!</p>
+                </div>
+            </a>
+        {% empty %}
+            <div class="text-center py-5">
+                <p class="text-muted">진행 중인 채팅이 없습니다. 🥕</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
