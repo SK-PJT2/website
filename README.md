@@ -33,15 +33,21 @@ docker-compose up --build -d
 ```
 > `web`(Nginx), `was`(Django), `db`(MariaDB) 3개의 서비스 컨테이너가 백그라운드에서 실행됩니다.
 
-**2. 데이터베이스 마이그레이션**
+**2. 데이터베이스 마이그레이션 파일 생성**
 ```bash
-docker-compose exec was python was/manage.py migrate
+docker-compose exec was python manage.py makemigrations accounts
 ```
-> Django 모델을 기반으로 데이터베이스에 테이블을 생성합니다.
+> `accounts` 앱에 `CustomUser` 모델이 있으므로, 데이터베이스에 적용할 마이그레이션 파일을 먼저 생성합니다.
 
-**3. 관리자 계정 생성**
+**3. 데이터베이스에 마이그레이션 적용**
 ```bash
-docker-compose exec was python was/manage.py createsuperuser
+docker-compose exec was python manage.py migrate
+```
+> 생성된 마이그레이션 파일을 포함하여 모든 변경사항을 데이터베이스에 적용합니다.
+
+**4. 관리자 계정 생성**
+```bash
+docker-compose exec was python manage.py createsuperuser
 ```
 > 안내에 따라 관리자 페이지에 로그인할 계정 정보를 입력합니다.
 

@@ -4,5 +4,3 @@ django==4.2
 mysqlclient
 # WAS
 gunicorn
-# Environment
-django-dotenv
