@@ -1,0 +1,8 @@
+# Framework
+django==4.2
+# Database
+mysqlclient
+# WAS
+gunicorn
+# Environment
+django-dotenv
