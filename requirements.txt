@@ -3,6 +3,7 @@ django==4.2
 # Database
 mysqlclient
 # WAS
+daphne
 gunicorn
 # .env 로딩(로컬 개발용, 컨테이너에서도 안전)
 python-dotenv
