@@ -4,7 +4,17 @@
   <h2>로그인</h2>
   <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
+    {% if error %}
+      <div style="color: red; margin-bottom: 10px;">{{ error }}</div>
+    {% endif %}
+    <div>
+      <label for="username">ID:</label>
+      <input type="text" name="username" id="username" required>
+    </div>
+    <div>
+      <label for="password">PW:</label>
+      <input type="password" name="password" id="password" required>
+    </div>
     <button type="submit">로그인</button>
   </form>
 {% endblock %}

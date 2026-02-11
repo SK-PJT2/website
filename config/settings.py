@@ -15,7 +15,9 @@ if load_dotenv is not None:
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
+# [취약점] A02: Security Misconfiguration (디버그 모드 강제 활성화)
+DEBUG = True 
+# DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 ALLOWED_HOSTS = ['*'] # For Docker environment
 
@@ -97,19 +99,21 @@ AUTH_USER_MODEL = 'accounts.CustomUser'
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
+# [취약점] A07: Authentication Failures
+# 모든 패스워드 검증 로직을 주석 처리하여 '1' 같은 단순한 비밀번호도 허용
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    # {
+    #     'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    # },
+    # {
+    #     'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    # },
+    # {
+    #     'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    # },
+    # {
+    #     'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    # },
 ]
 
 

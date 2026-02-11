@@ -84,6 +84,11 @@ def product_create_view(request):
         if category_id:
             category = get_object_or_404(Category, id=category_id)
 
+        # [취약점] A06: Insecure Design
+        # 가격 검증 없이 그대로 저장 (음수, 엄청 큰 수 등 허용)
+        # price = request.POST.get('price', '').strip() 
+        price = request.POST.get('price') # strip() 제거 등 최소한의 가공도 없이 저장
+
         product = Product.objects.create(
             seller=request.user,
             title=title,

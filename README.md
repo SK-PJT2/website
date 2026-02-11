@@ -1,6 +1,7 @@
-# SafePoint Market
+# SafePoint Market 🛡️💸 (Vulnerable Web App)
 
-중고거래와 포인트 금융 시스템이 결합된 'SafePoint Market' 프로젝트입니다. 이 프로젝트는 Docker 기반의 3-티어 아키텍처(Nginx-Gunicorn-MariaDB)로 구성되어 있으며, GitHub Actions를 통해 CI/CD가 자동화되어 있습니다.
+**SafePoint Market**은 OWASP Top 10 (2025) 취약점을 학습하고 실습하기 위해 의도적으로 취약하게 설계된 중고거래 웹 애플리케이션입니다.
+Docker 기반의 3-Tier 아키텍처(Nginx-Django-MariaDB)로 구성되어 있으며, 사용자는 이 환경에서 다양한 공격 기법을 안전하게 테스트해볼 수 있습니다.
 
 ---
 
@@ -11,65 +12,89 @@
 - **WAS**: Gunicorn
 - **Database**: MariaDB 10.6
 - **Container**: Docker & Docker-compose
-- **CI/CD**: GitHub Actions (Docker Hub Push)
+- **CI/CD**: GitHub Actions
 
 ---
 
-## 🚀 로컬 개발 환경 실행 가이드
+## 🚀 빠른 시작 가이드 (Quick Start)
 
-### 사전 준비 사항
-
-1.  **Docker & Docker Compose**: 로컬 시스템에 최신 버전의 Docker와 Docker Compose를 설치해야 합니다.
-2.  **환경 변수 파일 (`.env`) 생성**:
-    - 프로젝트 루트 디렉토리에 `.env` 파일을 생성하여 내용 복붙
-
-### 프로젝트 최초 실행
-
-터미널을 열고 프로젝트의 루트 디렉토리에서 아래 명령어들을 **순서대로** 실행하세요.
-
-**1. Docker 컨테이너 빌드 및 실행**
+### 1. 실행 (Run)
+터미널에서 아래 명령어로 컨테이너를 빌드하고 실행하세요.
 ```bash
 docker-compose up --build -d
 ```
-> `web`(Nginx), `was`(Django), `db`(MariaDB) 3개의 서비스 컨테이너가 백그라운드에서 실행됩니다.
 
-**2. 데이터베이스 마이그레이션 파일 생성**
-```bash
-docker-compose exec was python manage.py makemigrations accounts
-```
-> `accounts` 앱에 `CustomUser` 모델이 있으므로, 데이터베이스에 적용할 마이그레이션 파일을 먼저 생성합니다.
-
-**3. 데이터베이스에 마이그레이션 적용**
+### 2. 초기 세팅 (Setup)
+데이터베이스 마이그레이션을 통해 테이블과 **테스트 데이터(계정, 상품, 글)**를 생성합니다.
 ```bash
 docker-compose exec was python manage.py migrate
 ```
-> 생성된 마이그레이션 파일을 포함하여 모든 변경사항을 데이터베이스에 적용합니다.
+> **Note**: 이 명령어가 실행되면 `admin`, `victim`, `attacker` 등 테스트 계정과 상품, 채팅방, 게시글이 자동으로 생성됩니다.
 
-**4. 관리자 계정 생성**
-```bash
-docker-compose exec was python manage.py createsuperuser
-```
-> 안내에 따라 관리자 페이지에 로그인할 계정 정보를 입력합니다.
-
-**4. 접속 확인**
+### 3. 접속 (Access)
 - **웹사이트**: [http://localhost](http://localhost)
 - **관리자 페이지**: [http://localhost/admin](http://localhost/admin)
 
-> 웹 브라우저에서 접속하여 Django 기본 환영 페이지와 관리자 로그인 페이지가 정상적으로 보이는지 확인합니다.
+---
+
+## 👥 테스트 계정 정보 (Test Accounts)
+
+모든 비밀번호 패턴은 `아이디 + 123` 입니다.
+
+| 역할 | 아이디 | 비밀번호 | 설명 |
+| :--- | :--- | :--- | :--- |
+| **공격자** | `attacker` | `attacker123` | 해커 빙의용 계정 |
+| **피해자** | `victim` | `victim123` | 일반 판매자/구매자 |
+| **슈퍼유저** | `admin` | `admin123` | 사이트 관리자 |
+| **부자유저** | `rich_user` | `rich123` | 100만 포인트 보유 |
+| **거지유저** | `poor_user` | `poor123` | 500 포인트 보유 |
+
+---
+
+## ⚠️ 구현된 취약점 (Vulnerability Showcase)
+
+이 프로젝트에는 **OWASP Top 10 (2025)** 기반의 주요 취약점들이 곳곳에 숨겨져 있습니다.
+상세한 구현 원리는 **[OWASP_Top_10_Vulnerability_Implementation_Guide.md](./OWASP_Top_10_Vulnerability_Implementation_Guide.md)**를 참조하세요.
+
+| ID | 취약점 이름 (Vulnerability) | 위치/설명 |
+| :--- | :--- | :--- |
+| **A01** | **Broken Access Control** | `chat/views.py`: 남의 채팅방 훔쳐보기 (IDOR) |
+| **A02** | **Security Misconfiguration** | `settings.py`: `DEBUG=True` 및 `ALLOWED_HOSTS=['*']` |
+| **A04** | **Cryptographic Failures** | `accounts/views.py`: 2차 비밀번호 평문 저장 |
+| **A05** | **Injection (SQLi)** | `board/views.py`: 게시판 검색창 SQL Injection |
+| **A06** | **Insecure Design** | `market/views.py`: 상품 가격 조작 (마이너스 가격) |
+| **A07** | **Authentication Failures** | `accounts/views.py`: 로그인 실패 메시지 상세 노출 (User Enumeration) |
+| **A08** | **Integrity Failures** | `board/views.py`: 첨부파일 검증 부재 (Web Shell 업로드 가능) |
+| **A09** | **Security Logging Failures** | `accounts/views.py`: 로그인 시 비밀번호를 로그에 남김 |
+| **A10** | **Exception Handling** | `board/views.py`: 에러 발생 시 Stack Trace 노출 |
+
+---
+
+## ⚔️ 공격 실습 가이드 (Attack Guide)
+
+실제로 이 취약점들을 어떻게 공격하는지는 **[Attack_Examples.md](./Attack_Examples.md)** 파일에 단계별로 정리되어 있습니다.
+`attacker` 계정으로 로그인하여 직접 실습해 보시길 권장합니다.
+
+**대표적인 공격 시나리오:**
+1. **IDOR**: URL의 방 번호를 바꿔서 남의 대화 훔쳐보기
+2. **SQL Injection**: 검색창에 `' OR '1'='1` 입력하여 비밀글 탈취
+3. **Logic Flaw**: -50,000원짜리 상품을 구매하여 돈 복사하기
 
 ---
 
 ## ⚙️ 주요 Docker 명령어
 
-- **모든 서비스 시작 (백그라운드)**: `docker-compose up -d`
-- **모든 서비스 중지 및 컨테이너 삭제**: `docker-compose down`
-- **실시간 로그 확인**: `docker-compose logs -f was`
-- **컨테이너 내부 쉘 접속**: `docker-compose exec was bash`
+- **재시작 (코드 수정 반영)**: `docker-compose restart was`
+- **로그 확인 (로그인 비밀번호 노출 확인용)**: `docker-compose logs -f was`
+- **DB 초기화 및 데이터 복구**:
+  ```bash
+  docker-compose exec was python manage.py flush --no-input
+  docker-compose exec was python manage.py migrate
+  ```
 
 ---
 
-## 🔄 CI/CD (지속적 통합/배포)
+## ⚠️ Disclaimer
 
-- `main` 브랜치에 코드가 푸시되면, GitHub Actions가 자동으로 실행됩니다.
-- 워크플로우는 `Dockerfile`을 기반으로 새로운 Docker 이미지를 빌드하여 Docker Hub의 `[DOCKER_USERNAME]/safepoint-market:latest` 태그로 푸시합니다.
-- **주의**: 이 기능을 사용하려면 GitHub 저장소의 `Settings > Secrets and variables > Actions`에 `DOCKER_USERNAME`과 `DOCKER_PASSWORD`가 등록되어 있어야 합니다.
+본 프로젝트는 **정보 보안 교육 및 학습 목적**으로 제작되었습니다.
+반드시 본인의 로컬 환경(`localhost`)에서만 테스트하십시오.

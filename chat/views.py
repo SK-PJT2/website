@@ -25,9 +25,10 @@ def get_or_create_room(request, product_id):
 def room_detail(request, room_id):
     room = get_object_or_404(ChatRoom, id=room_id)
     
-    # 참여자가 아닌 사람이 접근하는 것 방지
-    if request.user != room.buyer and request.user != room.seller:
-        return redirect('home')
+    # [취약점] A01: Broken Access Control (IDOR)
+    # 소유자 검증 로직 제거! 누구든지 room_id만 알면 접근 가능
+    # if request.user != room.buyer and request.user != room.seller:
+    #     return redirect('home')
         
     messages = room.messages.all() # 이전 대화 내역 불러오기
     return render(request, 'chat/room.html', {

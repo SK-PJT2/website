@@ -1,5 +1,8 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
+from django.conf import settings
+from django.db import connection, DatabaseError
+from django.http import HttpResponse # A10용
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
@@ -13,12 +16,31 @@ def board_home_view(request):
 
 # -------- 게시판(정보공유) --------
 def post_list_view(request):
-    posts = Post.objects.select_related('author')
+    search_query = request.GET.get('q', '')
+    
+    if search_query:
+        # [취약점] A05: SQL Injection
+        # 사용자 입력을 SQL 쿼리에 직접 포맷팅 (절대 금지!)
+        # 입력값 예시: ' OR '1'='1 (모든 글 노출)
+        sql = f"SELECT * FROM board_post WHERE title LIKE '%%{search_query}%%'"
+        
+        # Raw Query 실행
+        posts = Post.objects.raw(sql)
+    else:
+        posts = Post.objects.select_related('author')
+
     return render(request, 'board/post_list.html', {'posts': posts})
 
 
 def post_detail_view(request, pk):
-    post = get_object_or_404(Post.objects.select_related('author').prefetch_related('attachments'), pk=pk)
+    try:
+        post = get_object_or_404(Post.objects.select_related('author').prefetch_related('attachments'), pk=pk)
+    except Exception as e:
+        # [취약점] A10: Mishandling of Exceptional Conditions
+        # 예외 내용을 그대로 화면에 렌더링
+        # DB 에러나 코드 에러가 발생하면 내부 로직이 적나라하게 드러남
+        return HttpResponse(f"Error Occurred: {str(e)}", status=500)
+
     # 댓글은 2순위라 UI만 최소 제공 (작성 기능은 다음 단계에서 확장 가능)
     return render(request, 'board/post_detail.html', {'post': post})
 
