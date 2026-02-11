@@ -1,0 +1,56 @@
+# 배포용 Docker Compose 파일
+# Docker Hub에 push된 이미지를 기반으로 서비스를 실행
+
+version: '3.8'
+
+services:
+  web:
+    image: nginx:latest
+    container_name: safepoint_web_deploy
+    ports:
+      - "80:80"
+    volumes:
+      - static_volume:/app/static
+      - media_volume:/app/media
+    networks:
+      - safepoint_net
+    depends_on:
+      - was
+
+  was:
+    image: gicks/safepoint-market:latest
+    container_name: safepoint_was_deploy
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - static_volume:/app/static
+      - media_volume:/app/media
+    networks:
+      - safepoint_net
+    depends_on:
+      - db
+
+  db:
+    image: mariadb:10.6
+    container_name: safepoint_db_deploy
+    restart: always
+    environment:
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${DB_PASSWORD}
+      TZ: Asia/Seoul
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - safepoint_net
+
+volumes:
+  static_volume:
+  media_volume:
+  db_data:
+
+networks:
+  safepoint_net:
+    driver: bridge
