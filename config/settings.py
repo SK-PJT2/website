@@ -1,9 +1,15 @@
 from pathlib import Path
 import os
-
+# 로컬 개발에서는 .env 로딩을 지원하되, 컨테이너(Compose env_file) 환경에서는 없어도 동작하도록 처리합니다.
+try:
+    from dotenv import load_dotenv
+except ModuleNotFoundError:  # python-dotenv 미설치 환경 대응
+    load_dotenv = None
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+if load_dotenv is not None:
+    load_dotenv(BASE_DIR / '.env')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
@@ -17,14 +23,22 @@ ALLOWED_HOSTS = ['*'] # For Docker environment
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',  # 반드시 맨 위에 추가하세요.
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Third party
+    'channels', # 추가
+
     # Custom Apps
     'accounts.apps.AccountsConfig',
+    'market.apps.MarketConfig',
+    'board.apps.BoardConfig',
+    'chat', # 추가
 ]
 
 MIDDLEWARE = [
@@ -56,7 +70,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
-
+ASGI_APPLICATION = 'config.asgi.application' # 추가
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -64,11 +78,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('DB_NAME'),
-        'USER': os.environ.get('DB_USER'),
-        'PASSWORD': os.environ.get('DB_PASSWORD'),
-        'HOST': os.environ.get('DB_HOST'),
-        'PORT': os.environ.get('DB_PORT'),
+        # 환경변수가 없을 때 None 대신 빈 문자열이 들어가도록 기본값을 지정합니다.
+        'NAME': os.environ.get('DB_NAME', ''),
+        'USER': os.environ.get('DB_USER', ''),
+        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+        'HOST': os.environ.get('DB_HOST', ''),
+        'PORT': os.environ.get('DB_PORT', ''),
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
         }
@@ -127,3 +142,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Redirect URLs
 LOGIN_REDIRECT_URL = 'market'
 LOGOUT_REDIRECT_URL = 'home'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("redis", 6379)], # yml에서 정한 서비스 이름 'redis' 사용
+        },
+    },
+}

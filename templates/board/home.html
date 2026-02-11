@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>커뮤니티</h1>
+    <p>정보공유 게시판과 지식인 Q&A를 이용할 수 있습니다.</p>
+
+    <ul>
+        <li><a href="{% url 'post_list' %}">정보공유 게시판</a></li>
+        <li><a href="{% url 'question_list' %}">지식인 Q&A</a></li>
+    </ul>
+{% endblock %}
+

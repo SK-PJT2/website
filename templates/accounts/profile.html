@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{{ profile_user.nickname|default:profile_user.username }}님의 프로필</h1>
+
+    <div style="display:flex; gap:20px; align-items:center; margin-top:20px;">
+        <div>
+            {% if profile_user.profile_image %}
+                <img src="{{ profile_user.profile_image.url }}" alt="프로필 이미지" style="width:120px; height:120px; object-fit:cover; border-radius:50%; border:1px solid #dee2e6;">
+            {% else %}
+                <div style="width:120px; height:120px; border-radius:50%; background:#f1f3f5; display:flex; align-items:center; justify-content:center; color:#868e96; border:1px solid #dee2e6;">
+                    프로필 이미지 없음
+                </div>
+            {% endif %}
+        </div>
+        <div>
+            <p><strong>닉네임</strong>: {{ profile_user.nickname|default:"(미설정)" }}</p>
+            <p><strong>아이디</strong>: {{ profile_user.username }}</p>
+            <p><strong>보유 포인트</strong>: {{ profile_user.points }} P</p>
+
+            {% if user.is_authenticated and user.id == profile_user.id %}
+                <p style="margin-top:20px;">
+                    <a href="{% url 'secondary_password_set' %}">2차 비밀번호 설정/변경하기</a>
+                </p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+

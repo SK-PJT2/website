@@ -20,5 +20,8 @@ COPY . /app/
 # Gunicorn 실행 포트 노출
 EXPOSE 8000
 
-# Gunicorn 서버 실행
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "config.wsgi:application"]
+# 기존 gunicorn 실행 명령어를 주석 처리하거나 삭제하고 아래 내용을 추가합니다.
+# CMD ["gunicorn", "--bind", "0.0.0.0:8000", "config.wsgi:application"]
+
+# Daphne로 ASGI 어플리케이션 실행
+CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "config.asgi:application"]
