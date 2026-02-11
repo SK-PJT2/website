@@ -9,10 +9,26 @@ Docker 기반의 3-Tier 아키텍처(Nginx-Django-MariaDB)로 구성되어 있�
 
 - **Framework**: Django 4.2+
 - **Web Server**: Nginx
-- **WAS**: Gunicorn
+- **WAS**: Daphne (ASGI)
 - **Database**: MariaDB 10.6
 - **Container**: Docker & Docker-compose
 - **CI/CD**: GitHub Actions
+
+### 🏗️ Architecture
+
+```mermaid
+graph LR
+    User[👤 User] -->|HTTP/WS| Nginx[🌐 Nginx (Web Server)]
+    subgraph "🐳 Docker Host"
+        Nginx -->|Reverse Proxy| Daphne[⚡ Daphne (ASGI)]
+        Daphne -->|SQL| MariaDB[🗄️ MariaDB (Database)]
+    end
+    
+    style User fill:#f9f,stroke:#333,stroke-width:2px
+    style Nginx fill:#bbf,stroke:#333,stroke-width:2px
+    style Daphne fill:#bfb,stroke:#333,stroke-width:2px
+    style MariaDB fill:#fbf,stroke:#333,stroke-width:2px
+```
 
 ---
 
