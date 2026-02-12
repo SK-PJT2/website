@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🚙 중고거래 사이트 🚙</title>
-    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <link rel="stylesheet" as="style" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <style>
         :root {
-            --primary-color: #FF7E36; /* 당근마켓 오렌지 */
+            --primary-color: #FF7E36;
+            /* 당근마켓 오렌지 */
             --light-gray: #F8F9FA;
             --gray-text: #868E96;
             --dark-text: #212529;
@@ -21,35 +24,61 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 10px 20px;
         }
 
         nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 20px;
+            padding: 15px 40px;
             background-color: white;
             border-bottom: 1px solid #E9ECEF;
+            white-space: nowrap;
+            width: 100%;
+            /* 화면 전체 너비 강제 */
+            box-sizing: border-box;
+            /* 패딩 포함 너비 계산 */
+            min-width: 1000px;
+            /* 최소 너비 보장 */
+            margin: 0;
         }
 
         nav .logo a {
             font-weight: 800;
             font-size: 1.5rem;
             color: var(--primary-color);
+            white-space: nowrap;
+            text-decoration: none;
+            flex-shrink: 0;
         }
-        
+
+        nav .nav-items {
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
         nav a {
             text-decoration: none;
             color: var(--dark-text);
             font-weight: 600;
-            margin-left: 20px;
+            margin-left: 15px;
+            font-size: 1rem;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
-        
+
         nav .user-info {
             color: var(--gray-text);
+            margin-right: 15px;
+            font-size: 1rem;
+            font-weight: 500;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         main {
@@ -58,13 +87,14 @@
             border-radius: 8px;
             margin-top: 20px;
         }
-        
+
         a {
             color: var(--primary-color);
             text-decoration: none;
         }
 
-        h1, h2 {
+        h1,
+        h2 {
             margin-top: 0;
             font-weight: 700;
         }
@@ -78,7 +108,7 @@
             display: flex;
             flex-direction: column;
         }
-        
+
         label {
             margin-bottom: 8px;
             font-weight: 600;
@@ -105,36 +135,35 @@
             cursor: pointer;
             margin-top: 10px;
         }
+
         button:hover {
             opacity: 0.9;
         }
-
     </style>
 </head>
+
 <body>
 
+    <nav>
+        <div class="logo">
+            <a href="/">🚙 중고거래 사이트 🚙</a>
+        </div>
+        <div class="nav-items">
+            {% if user.is_authenticated %}
+            <span class="user-info">안녕하세요, {{ user.nickname|default:user.username }}님!</span>
+            <a class="nav-link" href="{% url 'chat:chat_list' %}">💬 채팅</a>
+            <a href="{% url 'market' %}">마켓</a>
+            <a href="{% url 'board_home' %}">커뮤니티</a>
+            <a href="{% url 'profile' user.nickname|default:user.username %}">내 프로필</a>
+            <a href="{% url 'logout' %}">로그아웃</a>
+            {% else %}
+            <a href="{% url 'login' %}">로그인</a>
+            <a href="{% url 'signup' %}">회원가입</a>
+            {% endif %}
+        </div>
+    </nav>
+
     <div class="container">
-        <nav>
-            <div class="logo">
-                <a href="/">🚙 중고거래 사이트 🚙</a>
-            </div>
-            <div>
-                {% if user.is_authenticated %}
-                    <span class="user-info">안녕하세요, {{ user.nickname|default:user.username }}님!</span>
-                    <a class="nav-link" href="{% url 'chat:chat_list' %}">💬 채팅</a>
-                    <a href="{% url 'market' %}">마켓</a>
-                    <a href="{% url 'board_home' %}">커뮤니티</a>
-                    {% if user.nickname %}
-                        <a href="{% url 'profile' user.nickname %}">내 프로필</a>
-                    {% endif %}
-                    <a href="{% url 'logout' %}">로그아웃</a>
-                {% else %}
-                    <a href="{% url 'login' %}">로그인</a>
-                    <a href="{% url 'signup' %}">회원가입</a>
-                {% endif %}
-            </div>
-        </nav>
-    
         <main>
             {% block content %}
             {% endblock %}
@@ -142,4 +171,5 @@
     </div>
 
 </body>
+
 </html>

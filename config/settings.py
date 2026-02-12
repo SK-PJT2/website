@@ -16,7 +16,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # [취약점] A02: Security Misconfiguration (디버그 모드 강제 활성화)
-DEBUG = True 
+DEBUG = (os.getenv('DEBUG','False') =='True')
 # DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 ALLOWED_HOSTS = ['*'] # For Docker environment
